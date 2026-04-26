@@ -1,0 +1,39 @@
+{
+  "name": "delta-torch",
+  "version": "0.1.2",
+  "description": "Save tokens, survive context limits, and resume coding tasks across CLI agents with portable markdown handoffs.",
+  "author": {
+    "name": "MethosPi",
+    "url": "https://github.com/MethosPi"
+  },
+  "homepage": "https://github.com/MethosPi/delta-torch#readme",
+  "repository": "https://github.com/MethosPi/delta-torch",
+  "license": "MIT",
+  "keywords": [
+    "delta-torch",
+    "codex",
+    "skills",
+    "handoff",
+    "resume",
+    "cli"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "DeltaTorch",
+    "shortDescription": "Task handoff and resume workflows for coding agents",
+    "longDescription": "Save compact checkpoints, switch agents or phases, and resume work from .handoff state without rebuilding context.",
+    "developerName": "MethosPi",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/MethosPi/delta-torch#readme",
+    "defaultPrompt": [
+      "Use DeltaTorch to save this task before we switch agents.",
+      "Resume the latest DeltaTorch handoff in this repo.",
+      "List recent DeltaTorch checkpoints and tell me which one to continue."
+    ],
+    "brandColor": "#2563EB"
+  }
+}
