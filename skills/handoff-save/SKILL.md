@@ -17,10 +17,10 @@ Create a concise checkpoint for the current project state.
    - Resume Prompt
 2. Keep it compact and useful for another terminal agent.
 3. Use the supplied reason from `$ARGUMENTS`, or `manual` if none was provided.
-4. Save the checkpoint by running the bundled wrapper script:
+4. Save the checkpoint by running the CLI directly:
 
 ```bash
-"${CLAUDE_SKILL_DIR}/scripts/save.sh" "$ARGUMENTS" <<'EOF'
+pnpm dlx delta-torch save --reason "${ARGUMENTS:-manual}" <<'EOF'
 ## Original Prompt
 ...
 
@@ -44,4 +44,4 @@ Create a concise checkpoint for the current project state.
 EOF
 ```
 
-The wrapper forwards to `pnpm dlx delta-torch save --reason ...`. After saving, report the checkpoint id and path.
+Execute the command yourself. Do not ask the user to run it. After saving, report the short task number and suggest continuing it in another agent if needed.

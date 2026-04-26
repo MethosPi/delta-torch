@@ -36,7 +36,8 @@ function printHelp(): void {
       "  init",
       "  install-skills --target project|personal [--force]",
       "  save --reason <reason> [--agent <name>] [--stdin-section <section>]",
-      "  resume [latest|id]",
+      "  resume [latest|task-number|reason|id]",
+      "  continue [latest|task-number|reason|id]",
       "  list [--limit <n>]",
       "",
       "Save flags:",
@@ -169,6 +170,7 @@ function renderListOutput(payload: {
   projectRoot: string;
   activeHandoffId: string | null;
   entries: Array<{
+    taskNumber: number;
     id: string;
     createdAt: string;
     reason: string;
@@ -177,9 +179,11 @@ function renderListOutput(payload: {
     file: string;
   }>;
 }): string {
+  const activeEntry =
+    payload.entries.find((entry) => entry.id === payload.activeHandoffId) ?? null;
   const lines = [
     `Project root: ${payload.projectRoot}`,
-    `Active handoff: ${payload.activeHandoffId ?? "none"}`,
+    `Active handoff: ${activeEntry ? `#${activeEntry.taskNumber} (${activeEntry.id})` : payload.activeHandoffId ?? "none"}`,
     "",
     "Recent checkpoints:",
   ];
@@ -189,7 +193,7 @@ function renderListOutput(payload: {
   } else {
     for (const entry of payload.entries) {
       lines.push(
-        `- ${entry.id} | ${entry.reason} | ${entry.agentName} | ${entry.createdAt} | ${entry.branch ?? "not-a-git-repo"}`,
+        `- #${entry.taskNumber} | ${entry.reason} | ${entry.agentName} | ${entry.createdAt} | ${entry.branch ?? "not-a-git-repo"} | ${entry.id}`,
       );
     }
   }
@@ -256,11 +260,14 @@ async function main(): Promise<void> {
         ...(stdinSection ? { stdinSection } : {}),
       });
 
-      output.write(`Saved handoff ${result.id}\n${result.path}\n`);
+      output.write(
+        `Saved task #${result.taskNumber} (${result.id})\nContinue in another agent with: pnpm dlx delta-torch resume ${result.taskNumber}\n${result.path}\n`,
+      );
       return;
     }
 
-    case "resume": {
+    case "resume":
+    case "continue": {
       const target = parsed.positionals[0] ?? "latest";
       const result = await resumeHandoff({
         cwd,
@@ -269,6 +276,7 @@ async function main(): Promise<void> {
 
       output.write(
         [
+          `Task: #${result.entry.taskNumber}`,
           `Checkpoint: ${result.entry.id}`,
           `File: ${result.entry.file}`,
           "",

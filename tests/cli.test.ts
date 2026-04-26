@@ -76,11 +76,14 @@ Push it.
     });
 
     expect(save.status).toBe(0);
+    expect(save.stdout).toContain("Saved task #1");
 
     const list = runCli(["list"], { cwd: root });
+    expect(list.stdout).toContain("#1");
     expect(list.stdout).toContain("manual");
 
-    const resume = runCli(["resume", "latest"], { cwd: root });
+    const resume = runCli(["resume", "1"], { cwd: root });
+    expect(resume.stdout).toContain("Task: #1");
     expect(resume.stdout).toContain("## Resume Prompt");
     expect(resume.stdout).toContain("Checkpoint:");
   });

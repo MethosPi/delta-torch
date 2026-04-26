@@ -1,149 +1,58 @@
 # DeltaTorch
 
-Save tokens. Survive context limits. Finish the task.
+Save the task. Switch agent. Keep going.
 
-DeltaTorch is a tiny CLI that lets any terminal agent save a compact checkpoint before context pressure, rate limits, or token exhaustion force a stop. The next agent reads that checkpoint, gets a clean resume prompt, and keeps going without burning tokens rediscovering the project state.
+DeltaTorch is a small handoff skill + CLI for long coding sessions. When one agent is close to token, context, or rate limits, it saves a compact checkpoint. The next agent resumes from that checkpoint instead of redoing the same work.
 
-It works with Claude Code, Codex, OpenCode, Hermes Agent, and local agents running through Ollama or other providers, because the handoff format is plain Markdown under `.handoff/`.
+Works with Claude Code, Codex, Copilot, and local agents too. The handoff is just Markdown in `.handoff/`.
 
-npm package: [delta-torch](https://www.npmjs.com/package/delta-torch)
+[npm](https://www.npmjs.com/package/delta-torch)
 
-## Why It Exists
+## Install
 
-- Stop paying for the same context twice.
-- Keep long tasks moving when one agent hits limits.
-- Switch from a cloud agent to a cheaper or local model without losing momentum.
-- Leave behind a checkpoint another human or agent can audit in seconds.
+Pick your agent. One command. Done.
 
-DeltaTorch is intentionally small. It is not an MCP server, not an orchestrator, not a daemon, and not a dashboard. It just creates portable handoff files that help agents continue real work.
+| Agent | Install |
+| --- | --- |
+| Claude Code | `npx skills add MethosPi/delta-torch -a claude-code -y` |
+| Codex | `npx skills add MethosPi/delta-torch -a codex -y` |
+| GitHub Copilot | `npx skills add MethosPi/delta-torch -a github-copilot -y` |
+| Any other | `npx skills add MethosPi/delta-torch -y` |
 
-## The Core Loop
+Install once. After that, the agent should run DeltaTorch itself instead of asking you to copy commands.
 
-```bash
-pnpm dlx delta-torch init
-pnpm dlx delta-torch save --reason context-limit
-pnpm dlx delta-torch resume latest
-pnpm dlx delta-torch list
-```
+## Flow
 
-1. Start a task with your preferred CLI agent.
-2. Before the session gets expensive or unstable, save a handoff.
-3. Launch another agent.
-4. Resume from the generated checkpoint and keep shipping.
+1. Work in Claude Code, Codex, Copilot, or a local Ollama-based agent.
+2. When the agent is close to limits, it saves a handoff and tells you something like: `Continue task #3 in another agent`.
+3. Open the next agent and say: `continue task 3`.
+4. The agent runs DeltaTorch, loads the checkpoint, and continues from the saved state.
 
-## Cross-Agent Example
+Same project. Different agent. No restart.
 
-You start a refactor in Claude Code.
+## What It Does
 
-Claude is near its context limit, so you save:
+- Saves compact task checkpoints in `.handoff/`
+- Gives each handoff a short task number like `#3`
+- Lets another agent resume by task number, reason, or `latest`
+- Keeps the format simple and audit-friendly
+- Avoids secrets from common private paths and token patterns
 
-```bash
-pnpm dlx delta-torch save --reason context-limit <<'EOF'
-## Original Prompt
-Refactor the auth flow and keep tests green.
+## CLI
 
-## Goal
-Ship the refactor without restarting the work.
-
-## Work Completed
-- Moved session parsing into a shared module.
-- Updated API handlers.
-
-## Current State
-- Most code is done.
-- Two integration tests still fail.
-
-## Problems / Risks
-- Cookie parsing may still differ in edge runtime.
-
-## Next Steps
-1. Fix the failing tests.
-2. Re-run the auth suite.
-3. Commit only the refactor files.
-EOF
-```
-
-Now Claude stops. You open Codex, OpenCode, Hermes Agent, or a local Ollama-powered agent and run:
-
-```bash
-pnpm dlx delta-torch resume latest
-```
-
-DeltaTorch prints the saved checkpoint plus a ready-to-paste `Resume Prompt`. Paste it into the next agent and continue the same task instead of re-explaining the repo from scratch.
-
-That is the whole point: less wasted context, lower cost, more completed tasks.
-
-## Works With Any CLI Agent
-
-The handoff artifact is the product.
-
-- The checkpoint is a Markdown file in `.handoff/handoffs/`.
-- The resume payload is plain text, so any agent can consume it.
-- Claude Code gets optional skills because it supports folder-based `SKILL.md` skills natively.
-- Everyone else can use DeltaTorch directly from the CLI without any plugin system.
-
-## Optional Claude Code Skills
-
-If you use Claude Code, you can install the skill pack:
-
-```bash
-pnpm dlx delta-torch install-skills --target project
-```
-
-Installed skills:
-
-- `handoff-guard`: reminds the agent to save before context pressure becomes a problem.
-- `handoff-save`: creates a checkpoint on demand.
-- `handoff-resume`: loads the latest or requested checkpoint.
-- `handoff-status`: shows recent handoffs for the current project.
-
-These skills are convenience wrappers around the CLI. They are not required for Codex, Ollama-based agents, or any other terminal workflow.
-
-## Commands
+No global install required.
 
 ```bash
 pnpm dlx delta-torch init
-pnpm dlx delta-torch install-skills --target project
-pnpm dlx delta-torch save --reason context-limit
-pnpm dlx delta-torch resume latest
+pnpm dlx delta-torch save --reason auth-refactor
+pnpm dlx delta-torch resume 3
 pnpm dlx delta-torch list
 ```
 
-### `save`
-
-`save` accepts structured Markdown on stdin and merges it with safe git metadata such as the current branch and filtered `git status --short`.
+If you want the CLI in the repo:
 
 ```bash
-pnpm dlx delta-torch save --reason handoff <<'EOF'
-## Goal
-Finish the migration.
-
-## Work Completed
-- Replaced the old queue consumer.
-
-## Current State
-- Production config still needs validation.
-
-## Next Steps
-1. Run staging smoke tests.
-2. Roll forward if metrics stay clean.
-EOF
-```
-
-### `resume`
-
-`resume` prints the checkpoint and a continuation prompt that can be pasted into another agent.
-
-```bash
-pnpm dlx delta-torch resume latest
-```
-
-### `list`
-
-`list` shows the recent checkpoint history for the current project.
-
-```bash
-pnpm dlx delta-torch list
+pnpm add -D delta-torch
 ```
 
 ## File Layout
@@ -156,44 +65,32 @@ pnpm dlx delta-torch list
     2026-04-26T12-30-00Z-context-limit.md
 ```
 
-Each checkpoint contains:
+Each handoff stores:
 
 - original prompt
 - goal
-- work completed
+- completed work
 - current state
 - changed files
 - commands run
-- problems or risks
+- risks
 - next steps
-- a resume prompt for the next agent
+- a ready-to-use resume prompt
 
-## Security Defaults
+## Notes
 
-- DeltaTorch never reads your file contents automatically.
-- Git-derived file lists are filtered to avoid `.env`, private keys, and common private credential paths.
-- Freeform checkpoint text is passed through lightweight secret redaction for common token and key patterns.
+- DeltaTorch is not an MCP server, not an orchestrator, and not a daemon.
+- Claude Code gets slash-friendly skills. Other agents use the same handoff files and CLI.
+- The repo already includes CI plus automated releases/npm publish wiring.
 
-## Release Automation
+## Manual Claude Install
 
-This repository is wired for automated versioning, GitHub Releases, and npm publishing.
-
-- CI runs on push and pull request.
-- Release Please opens version PRs from conventional commits.
-- Publishing happens from GitHub Actions to [npm](https://www.npmjs.com/package/delta-torch).
-
-One-time setup still required on npm:
-
-1. Create the `delta-torch` package in the `MethosPi` npm account.
-2. Configure npm Trusted Publishing for the `MethosPi/delta-torch` GitHub repository and `.github/workflows/release.yml`.
-
-After that, merging releasable commits to `main` is enough to cut versions and publish.
-
-## Development
+If you want the Claude-only fallback:
 
 ```bash
-pnpm install
-pnpm test
+pnpm dlx delta-torch install-skills --target project
 ```
 
-Use conventional commits such as `feat:` and `fix:` if you want the automated release flow to produce clean version bumps and release notes.
+## License
+
+MIT

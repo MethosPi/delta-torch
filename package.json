@@ -9,6 +9,7 @@
   "files": [
     "dist",
     "skills",
+    "AGENTS.md",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"

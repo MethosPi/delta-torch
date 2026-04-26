@@ -92,6 +92,7 @@ function buildCommandsSection(
 }
 
 function generateResumePrompt(options: {
+  taskNumber: number;
   id: string;
   reason: string;
   agentName: string;
@@ -101,6 +102,7 @@ function generateResumePrompt(options: {
   const lines = [
     "Continue this task from the saved Agent Handoff checkpoint.",
     "",
+    `Task Number: #${options.taskNumber}`,
     `Checkpoint ID: ${options.id}`,
     `Reason: ${options.reason}`,
     `Previous agent: ${options.agentName}`,
@@ -161,6 +163,7 @@ export async function saveHandoff(
   input: SaveCommandInput,
 ): Promise<SaveCommandResult> {
   const projectRoot = await ensureInitializedProject(input.cwd);
+  const registry = await readRegistry(projectRoot);
   const gitContext = collectGitContext(projectRoot);
   const stdinText = input.stdinText ?? "";
   const parsedStdin = applyStdinToSection(
@@ -177,6 +180,7 @@ export async function saveHandoff(
     (entry) => `${entry.status} ${entry.path}`,
   );
   const manualSections = input.sections ?? {};
+  const taskNumber = registry.nextTaskNumber;
 
   const sectionsWithoutResume = {
     originalPrompt: compactJoin([
@@ -213,13 +217,13 @@ export async function saveHandoff(
   const resumePrompt =
     compactJoin([parsedStdin.resumePrompt, manualSections.resumePrompt]) ??
     generateResumePrompt({
+      taskNumber,
       id,
       reason,
       agentName,
       branch: gitContext.branch,
       sections: sectionsWithoutResume,
     });
-
   const sections = materializeSections({
     ...sectionsWithoutResume,
     resumePrompt,
@@ -227,9 +231,9 @@ export async function saveHandoff(
   const markdown = renderHandoffMarkdown(sections);
   const filename = `${id}.md`;
   const absoluteFilePath = await writeHandoffFile(projectRoot, filename, markdown);
-  const registry = await readRegistry(projectRoot);
   const relativeFile = join(".handoff", "handoffs", filename);
   const entry: RegistryEntry = {
+    taskNumber,
     id,
     createdAt: now.toISOString(),
     reason,
@@ -239,10 +243,12 @@ export async function saveHandoff(
   };
 
   registry.activeHandoffId = id;
+  registry.nextTaskNumber = taskNumber + 1;
   registry.entries = [entry, ...registry.entries.filter((item) => item.id !== id)];
   await writeRegistry(projectRoot, registry);
 
   return {
+    taskNumber,
     id,
     path: absoluteFilePath,
     markdown,
@@ -277,12 +283,23 @@ export async function resumeHandoff(options: {
 }> {
   const projectRoot = await ensureInitializedProject(options.cwd);
   const registry = await readRegistry(projectRoot);
-  const target = options.target && options.target !== "latest" ? options.target : null;
+  const target = options.target?.trim();
+  const normalizedTarget =
+    target && target !== "latest" ? sanitizeReason(target.replace(/^#/, "")) : null;
+  const numericTarget =
+    normalizedTarget && /^\d+$/.test(normalizedTarget)
+      ? Number.parseInt(normalizedTarget, 10)
+      : null;
   const entry =
-    (target
-      ? registry.entries.find(
-          (item) => item.id === target || item.file.endsWith(`${target}.md`),
-        )
+    (normalizedTarget
+      ? registry.entries.find((item) => item.id === target) ??
+        registry.entries.find((item) => item.file.endsWith(`${target}.md`)) ??
+        (numericTarget !== null
+          ? registry.entries.find((item) => item.taskNumber === numericTarget)
+          : undefined) ??
+        registry.entries.find((item) => item.reason === normalizedTarget) ??
+        registry.entries.find((item) => item.id.includes(normalizedTarget)) ??
+        registry.entries.find((item) => item.reason.includes(normalizedTarget))
       : registry.entries[0]) ?? null;
 
   if (!entry) {

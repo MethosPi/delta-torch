@@ -10,7 +10,7 @@ import {
   HANDOFFS_DIR_NAME,
   REGISTRY_FILE_NAME,
 } from "./constants.js";
-import type { HandoffConfig, RegistryFile } from "./types.js";
+import type { HandoffConfig, RegistryEntry, RegistryFile } from "./types.js";
 
 export class UserFacingError extends Error {}
 
@@ -68,6 +68,7 @@ export async function initProject(projectRoot: string): Promise<string[]> {
     const registry: RegistryFile = {
       version: HANDOFF_FORMAT_VERSION,
       activeHandoffId: null,
+      nextTaskNumber: 1,
       entries: [],
     };
     await writeFile(
@@ -112,7 +113,29 @@ export async function ensureInitializedProject(startCwd: string): Promise<string
 export async function readRegistry(projectRoot: string): Promise<RegistryFile> {
   const { registryPath } = handoffPaths(projectRoot);
   const raw = await readFile(registryPath, "utf8");
-  return JSON.parse(raw) as RegistryFile;
+  const parsed = JSON.parse(raw) as Partial<RegistryFile> & {
+    entries?: Array<Partial<RegistryEntry>>;
+  };
+  const normalizedEntries = (parsed.entries ?? []).map((entry, index) => ({
+    taskNumber: entry.taskNumber ?? index + 1,
+    id: entry.id ?? `legacy-${index + 1}`,
+    createdAt: entry.createdAt ?? new Date(0).toISOString(),
+    reason: entry.reason ?? "manual",
+    agentName: entry.agentName ?? "unknown-agent",
+    branch: entry.branch ?? null,
+    file: entry.file ?? "",
+  }));
+  const nextTaskNumber =
+    parsed.nextTaskNumber ??
+    normalizedEntries.reduce((maxValue, entry) => Math.max(maxValue, entry.taskNumber), 0) +
+      1;
+
+  return {
+    version: parsed.version ?? HANDOFF_FORMAT_VERSION,
+    activeHandoffId: parsed.activeHandoffId ?? null,
+    nextTaskNumber,
+    entries: normalizedEntries,
+  };
 }
 
 export async function writeRegistry(

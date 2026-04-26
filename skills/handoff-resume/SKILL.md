@@ -1,17 +1,17 @@
 ---
 name: handoff-resume
-description: Loads the latest or named handoff checkpoint and prints the continuation prompt for the next agent.
-argument-hint: [latest|id]
+description: Loads the latest or named handoff checkpoint and continues the task from a short task number, reason, or full id.
+argument-hint: [latest|task-number|reason|id]
 disable-model-invocation: true
 ---
 
 Load the saved checkpoint and continue from it instead of restarting the task.
 
-1. Use `$ARGUMENTS` as the checkpoint selector. Default to `latest` if none was provided.
-2. Run the bundled wrapper script:
+1. Use `$ARGUMENTS` as the checkpoint selector. Accept `latest`, a short task number such as `3`, a reason such as `auth-refactor`, or a full checkpoint id.
+2. Run the CLI directly:
 
 ```bash
-"${CLAUDE_SKILL_DIR}/scripts/resume.sh" "$ARGUMENTS"
+pnpm dlx delta-torch resume "${ARGUMENTS:-latest}"
 ```
 
-The wrapper forwards to `pnpm dlx delta-torch resume latest` or the selected checkpoint id. Read the output carefully, then continue from the `Resume Prompt` and `Next Steps` sections.
+Execute the command yourself. Do not ask the user to run it. Read the output carefully, then continue from the `Resume Prompt` and `Next Steps` sections.

@@ -23,11 +23,15 @@ describe("registry updates", () => {
       await readFile(join(root, ".handoff", "registry.json"), "utf8"),
     ) as {
       activeHandoffId: string | null;
-      entries: Array<{ id: string }>;
+      nextTaskNumber: number;
+      entries: Array<{ id: string; taskNumber: number }>;
     };
 
     expect(result.id).toBe("2026-04-26T12-30-00Z-context-limit");
+    expect(result.taskNumber).toBe(1);
     expect(registry.activeHandoffId).toBe(result.id);
+    expect(registry.nextTaskNumber).toBe(2);
+    expect(registry.entries[0]?.taskNumber).toBe(1);
     expect(registry.entries[0]?.id).toBe(result.id);
   });
 });

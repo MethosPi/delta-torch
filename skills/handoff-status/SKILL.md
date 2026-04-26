@@ -9,7 +9,7 @@ Inspect the current project handoff state before creating or resuming a checkpoi
 Run:
 
 ```bash
-"${CLAUDE_SKILL_DIR}/scripts/status.sh"
+pnpm dlx delta-torch list
 ```
 
-The wrapper forwards to `pnpm dlx delta-torch list`. Summarize the active checkpoint, recent reasons, timestamps, and agent names for the user.
+Execute the command yourself. Do not ask the user to run it. Summarize the active task number, recent reasons, timestamps, and agent names for the user.

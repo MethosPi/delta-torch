@@ -21,6 +21,7 @@ export interface HandoffConfig {
 }
 
 export interface RegistryEntry {
+  taskNumber: number;
   id: string;
   createdAt: string;
   reason: string;
@@ -32,6 +33,7 @@ export interface RegistryEntry {
 export interface RegistryFile {
   version: number;
   activeHandoffId: string | null;
+  nextTaskNumber: number;
   entries: RegistryEntry[];
 }
 
@@ -61,6 +63,7 @@ export interface SaveCommandInput {
 }
 
 export interface SaveCommandResult {
+  taskNumber: number;
   id: string;
   path: string;
   markdown: string;

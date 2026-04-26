@@ -6,10 +6,11 @@ when_to_use: Use at session start when the user wants long task continuity, or w
 
 While this skill is active:
 
-1. Keep working normally, but save a checkpoint before context pressure, compaction risk, rate limits, or an interrupted session would make continuation harder.
-2. Prefer saving early instead of waiting for the session to become unstable.
-3. Keep checkpoints short, factual, and useful for the next agent.
-4. Never include secrets, `.env` contents, tokens, or private keys in the checkpoint.
-5. Use `/handoff-save context-limit` or run `pnpm dlx delta-torch save --reason context-limit` when it is time to hand off.
+1. Keep working normally, but if context pressure, compaction risk, rate limits, or session expiry may interrupt the task, save a handoff before it becomes urgent.
+2. Execute the CLI yourself. Do not ask the user to copy-paste commands.
+3. Run `pnpm dlx delta-torch init` once per project if `.handoff/` is missing.
+4. Save with `pnpm dlx delta-torch save --reason context-limit` and include concise sections for completed work, current state, risks, and next steps.
+5. After saving, tell the user to continue the task in another agent using the short task number, for example: `Continue task #3 in Codex`.
+6. Never include secrets, `.env` contents, tokens, or private keys in the checkpoint.
 
-If the task is still active near the end of a session, create a fresh handoff before stopping.
+If the user asks to continue a suspended task by number, name, or `latest`, run `pnpm dlx delta-torch resume <selector>` yourself and continue from the saved prompt.
