@@ -2,7 +2,7 @@
 
 Save the task. Switch agent. Keep going.
 
-DeltaTorch is a small handoff skill + CLI for long coding sessions. When one agent is close to token, context, or rate limits, it saves a compact checkpoint. The next agent resumes from that checkpoint instead of redoing the same work.
+DeltaTorch is a small handoff skill + CLI for coding sessions that move between agents. One agent saves a compact checkpoint. The next agent resumes from that checkpoint instead of redoing the same work.
 
 Works with Claude Code, Codex, Copilot, and local agents too. The handoff is just Markdown in `.handoff/`.
 
@@ -24,17 +24,26 @@ Install once. After that, the agent should run DeltaTorch itself instead of aski
 ## Flow
 
 1. Work in Claude Code, Codex, Copilot, or a local Ollama-based agent.
-2. When the agent is close to limits, it saves a handoff and tells you something like: `Continue task #3 in another agent`.
+2. Save a handoff when you want to switch agent, switch model, switch phase, or just preserve progress.
 3. Open the next agent and say: `continue task 3`.
 4. The agent runs DeltaTorch, loads the checkpoint, and continues from the saved state.
 
 Same project. Different agent. No restart.
+
+Use it for:
+
+- Claude writes the plan, Codex executes it
+- Codex implements, Claude reviews
+- Claude prepares the task, local Ollama finishes it
+- Local model explores, stronger model takes the final pass
+- Any agent saves before limits, then another agent continues
 
 ## What It Does
 
 - Saves compact task checkpoints in `.handoff/`
 - Gives each handoff a short task number like `#3`
 - Lets another agent resume by task number, reason, or `latest`
+- Works for intentional handoffs, not only limit recovery
 - Keeps the format simple and audit-friendly
 - Avoids secrets from common private paths and token patterns
 
@@ -44,7 +53,7 @@ No global install required.
 
 ```bash
 pnpm dlx delta-torch init
-pnpm dlx delta-torch save --reason auth-refactor
+pnpm dlx delta-torch save --reason ready-for-review
 pnpm dlx delta-torch resume 3
 pnpm dlx delta-torch list
 ```
