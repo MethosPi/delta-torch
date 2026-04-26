@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file. Versions
 from `v0.1.5` onward are managed with [changesets](https://github.com/changesets/changesets);
 versions before that were backfilled from the git tag history.
 
+## 0.1.6
+
+### Patch Changes
+
+- Tag-driven release pipeline: pushes to `main` no longer auto-publish; releases now require a `v*` tag (or manual `workflow_dispatch`) and refuse to publish unless the tag matches `package.json`.
+- CI now runs `pnpm lint` and `pnpm audit --prod` in addition to `pnpm test`, so type errors and runtime-dependency CVEs fail the build.
+- `delta-torch resume` reports a clean user-facing error (with a hint to run `delta-torch list`) instead of a stack trace when no checkpoint matches, and only resolves exact id, file basename, task number, or reason — no more silent substring fallbacks.
+- Unexpected `git` failures (missing binary, permission errors, corrupted repo) now surface a one-line warning on stderr instead of producing an empty git snapshot in the saved handoff. The "not a git repository" detection path stays silent.
+- Secret redaction now covers standalone assignments like `API_KEY=`, `DATABASE_URL=`, `PRIVATE_KEY=`, `ACCESS_KEY=`, `TOKEN=`, `SECRET=`, `PASSWORD=`, `PASS=`, and `DSN=`. Previously these slipped through because the regex required at least one character of prefix before the keyword.
+- New unit test suites for `src/security.ts` and `src/text.ts` (45 live assertions across the project, up from 10).
+- `.agents/` is now ignored and `marketplace.json` is no longer tracked; the file was developer-local Claude Code state.
+- Adopt [changesets](https://github.com/changesets/changesets) for changelog management. CHANGELOG backfilled from git tag history.
+- README: replace the placeholder `YYYY-MM-DDTHH-MM-SSZ` timestamp in the Quick Demo with a concrete example matching the real id format, and document the new tag-driven release flow.
+
 ## 0.1.5
 
 ### Patch Changes
