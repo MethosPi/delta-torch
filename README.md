@@ -90,7 +90,7 @@ Each handoff stores:
 
 - DeltaTorch is not an MCP server, not an orchestrator, and not a daemon.
 - Claude Code gets slash-friendly skills. Other agents use the same handoff files and CLI.
-- The repo already includes CI plus automated releases/npm publish wiring.
+- Every push to `main` runs tests and publishes a new npm/GitHub release.
 
 ## Manual Claude Install
 
