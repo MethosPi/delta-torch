@@ -1,6 +1,6 @@
 {
   "name": "delta-torch",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Save tokens, survive context limits, and resume coding tasks across CLI agents with portable markdown handoffs.",
   "type": "module",
   "bin": {
