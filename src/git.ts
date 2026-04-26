@@ -9,11 +9,28 @@ function runGit(cwd: string, args: string[]): string | null {
     encoding: "utf8",
   });
 
+  if (result.error) {
+    process.stderr.write(
+      `delta-torch: git ${args.join(" ")} could not be executed: ${result.error.message}\n`,
+    );
+    return null;
+  }
+
   if (result.status !== 0) {
+    const stderr = result.stderr?.trim();
+    if (stderr && !isBenignGitError(stderr)) {
+      process.stderr.write(
+        `delta-torch: git ${args.join(" ")} failed (exit ${result.status}): ${stderr}\n`,
+      );
+    }
     return null;
   }
 
   return result.stdout.trimEnd();
+}
+
+function isBenignGitError(stderr: string): boolean {
+  return /not a git repository/i.test(stderr);
 }
 
 function parseChangedFiles(statusLines: string[]): GitChangedFile[] {
