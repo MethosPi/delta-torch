@@ -1,5 +1,7 @@
 # DeltaTorch
 
+![DeltaTorch handoff between AI coding agents](assets/delta-torch-hero.png)
+
 Save the task. Switch agent. Keep going when limits hit.
 
 DeltaTorch is a small handoff skill + CLI for coding sessions that move between agents before context, usage, rate, token, or paid-plan limits stop the work. One agent saves a compact checkpoint. The next agent resumes from that checkpoint instead of redoing the same work or making you copy-paste context.
