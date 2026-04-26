@@ -52,14 +52,14 @@ Outlined the fallback messaging.
 ## Next Steps
 Resume in Codex and edit the docs.
 EOF
-Saved task #1 (YYYY-MM-DDTHH-MM-SSZ-context-limit)
+Saved task #1 (2026-04-26T12-30-00Z-context-limit)
 Continue in another agent with: pnpm dlx delta-torch resume 1
-/path/to/project/.handoff/handoffs/YYYY-MM-DDTHH-MM-SSZ-context-limit.md
+/path/to/project/.handoff/handoffs/2026-04-26T12-30-00Z-context-limit.md
 
 $ pnpm dlx delta-torch resume 1
 Task: #1
-Checkpoint: YYYY-MM-DDTHH-MM-SSZ-context-limit
-File: .handoff/handoffs/YYYY-MM-DDTHH-MM-SSZ-context-limit.md
+Checkpoint: 2026-04-26T12-30-00Z-context-limit
+File: .handoff/handoffs/2026-04-26T12-30-00Z-context-limit.md
 
 # Agent Handoff
 
