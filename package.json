@@ -1,6 +1,6 @@
 {
   "name": "delta-torch",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Save before context, usage, rate, or token-budget limits and resume coding tasks across Claude Code, Codex, Copilot, and local agents.",
   "type": "module",
   "bin": {
