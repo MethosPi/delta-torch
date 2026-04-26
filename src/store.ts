@@ -1,4 +1,4 @@
-import { mkdir, readFile, stat, writeFile, cp, chmod } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile, cp, chmod, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, parse, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -173,11 +173,14 @@ export async function installSkills(options: {
       : join(resolve(process.env.HOME ?? "~"), ".claude", "skills");
 
   await mkdir(targetDir, { recursive: true });
-  await cp(sourceDir, targetDir, {
-    recursive: true,
-    force: options.force,
-    errorOnExist: !options.force,
-  });
+  const entries = await readdir(sourceDir);
+  for (const entry of entries) {
+    await cp(join(sourceDir, entry), join(targetDir, entry), {
+      recursive: true,
+      force: options.force,
+      errorOnExist: !options.force,
+    });
+  }
 
   for (const scriptPath of [
     join(targetDir, "handoff-save", "scripts", "save.sh"),
