@@ -25,7 +25,7 @@ Install once. After that, the agent should run DeltaTorch itself instead of aski
 
 ## Flow
 
-Start a task with any agent. If that agent gets close to a token, context, usage, or rate limit, it saves the current task context so another agent can continue from the same point.
+Start a task with any agent. If that agent gets close to a token, usage, or rate limit, it saves the current task context so another agent can continue from the same point.
 
 You can also split the work intentionally: one agent plans, another executes, and another reviews. The same checkpoint format works for both cases.
 
