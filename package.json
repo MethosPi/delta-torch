@@ -1,0 +1,50 @@
+{
+  "name": "agent-handoff",
+  "version": "0.1.0",
+  "description": "Minimal token handoff CLI and Claude Code skill pack for compact project checkpoints.",
+  "type": "module",
+  "bin": {
+    "agent-handoff": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit",
+    "prepack": "pnpm build",
+    "test": "pnpm build && vitest run"
+  },
+  "keywords": [
+    "claude-code",
+    "skills",
+    "handoff",
+    "checkpoint",
+    "cli",
+    "agent"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MethosPi/delta-torch.git"
+  },
+  "homepage": "https://github.com/MethosPi/delta-torch#readme",
+  "bugs": {
+    "url": "https://github.com/MethosPi/delta-torch/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
