@@ -9,7 +9,7 @@ const SENSITIVE_PATH_PATTERNS = [
 ];
 
 const SECRET_ASSIGNMENT_RE =
-  /\b([A-Z][A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|PASS|API[_-]?KEY|PRIVATE[_-]?KEY|ACCESS[_-]?KEY|DATABASE_URL|DSN))\s*=\s*([^\n]+)/g;
+  /\b((?:[A-Z][A-Z0-9_]*)?(?:TOKEN|SECRET|PASSWORD|PASS|API[_-]?KEY|PRIVATE[_-]?KEY|ACCESS[_-]?KEY|DATABASE_URL|DSN))\s*=\s*([^\n]+)/g;
 const PRIVATE_KEY_BLOCK_RE =
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g;
 const BEARER_TOKEN_RE = /\bBearer\s+[A-Za-z0-9._-]{12,}\b/g;

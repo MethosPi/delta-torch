@@ -84,13 +84,30 @@ describe("redactSensitiveText", () => {
     }
   });
 
-  // Known gap: SECRET_ASSIGNMENT_RE requires at least one character of prefix
-  // before the keyword (`[A-Z][A-Z0-9_]*` is "1+" not "0+"). Standalone names
-  // like `API_KEY=...` or `DATABASE_URL=...` therefore slip through redaction.
-  // See follow-up PR for the regex fix; once that lands, swap these to `it`.
-  it.todo("redacts standalone API_KEY assignments");
-  it.todo("redacts standalone DATABASE_URL assignments");
-  it.todo("redacts standalone PRIVATE_KEY and ACCESS_KEY assignments");
+  it("redacts standalone API_KEY assignments", () => {
+    expect(redactSensitiveText("API_KEY=sk-live-12345")).toBe("API_KEY=[REDACTED]");
+    expect(redactSensitiveText("API-KEY=sk-live-12345")).toBe("API-KEY=[REDACTED]");
+  });
+
+  it("redacts standalone DATABASE_URL and DSN assignments", () => {
+    expect(redactSensitiveText("DATABASE_URL=postgres://u:p@host/db")).toBe(
+      "DATABASE_URL=[REDACTED]",
+    );
+    expect(redactSensitiveText("DSN=https://abc@sentry.io/1")).toBe("DSN=[REDACTED]");
+  });
+
+  it("redacts standalone PRIVATE_KEY and ACCESS_KEY assignments", () => {
+    expect(redactSensitiveText("PRIVATE_KEY=value")).toBe("PRIVATE_KEY=[REDACTED]");
+    expect(redactSensitiveText("ACCESS_KEY=AKIA...")).toBe("ACCESS_KEY=[REDACTED]");
+    expect(redactSensitiveText("PRIVATE-KEY=value")).toBe("PRIVATE-KEY=[REDACTED]");
+  });
+
+  it("redacts standalone TOKEN, SECRET, PASSWORD, and PASS assignments", () => {
+    expect(redactSensitiveText("TOKEN=abc123")).toBe("TOKEN=[REDACTED]");
+    expect(redactSensitiveText("SECRET=hunter2")).toBe("SECRET=[REDACTED]");
+    expect(redactSensitiveText("PASSWORD=letmein")).toBe("PASSWORD=[REDACTED]");
+    expect(redactSensitiveText("PASS=letmein")).toBe("PASS=[REDACTED]");
+  });
 
   it("does not redact lowercase or unrelated assignments", () => {
     expect(redactSensitiveText("name=david")).toBe("name=david");
