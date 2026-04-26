@@ -2,8 +2,6 @@
 
 DeltaTorch is a minimal open-source token handoff skill pack for Claude Code style workflows. It ships a small CLI plus installable skills that save a compact markdown checkpoint under `.handoff/` before context pressure, rate limits, or a mid-task stop make continuation expensive.
 
-It is intentionally not an MCP server, not an orchestrator, and not a daemon. Version 1 only manages project-local handoff files.
-
 ## What It Does
 
 - `init` creates `.handoff/` storage.
