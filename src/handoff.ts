@@ -11,6 +11,7 @@ import {
   handoffPaths,
   readRegistry,
   relativeToProject,
+  UserFacingError,
   writeHandoffFile,
   writeRegistry,
 } from "./store.js";
@@ -297,13 +298,14 @@ export async function resumeHandoff(options: {
         (numericTarget !== null
           ? registry.entries.find((item) => item.taskNumber === numericTarget)
           : undefined) ??
-        registry.entries.find((item) => item.reason === normalizedTarget) ??
-        registry.entries.find((item) => item.id.includes(normalizedTarget)) ??
-        registry.entries.find((item) => item.reason.includes(normalizedTarget))
+        registry.entries.find((item) => item.reason === normalizedTarget)
       : registry.entries[0]) ?? null;
 
   if (!entry) {
-    throw new Error("No saved handoff checkpoint found for the requested id.");
+    const hint = target
+      ? `No saved handoff checkpoint matched "${target}". Run \`delta-torch list\` to see available task numbers, ids, and reasons.`
+      : "No saved handoff checkpoints found. Run `delta-torch save --reason <reason>` first.";
+    throw new UserFacingError(hint);
   }
 
   const markdown = await import("node:fs/promises").then(({ readFile }) =>
