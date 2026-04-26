@@ -114,6 +114,32 @@ Keep going.
     expect(markdown).toContain("tracked.txt");
   });
 
+  it("excludes handoff metadata from git snapshots", async () => {
+    const root = await mkdtemp(join(tmpdir(), "agent-handoff-metadata-"));
+    runGit(["init"], root);
+    runGit(["config", "user.name", "DeltaTorch Test"], root);
+    runGit(["config", "user.email", "test@example.com"], root);
+    await writeFile(join(root, "tracked.txt"), "hello\n", "utf8");
+    runGit(["add", "tracked.txt"], root);
+    runGit(["commit", "-m", "init"], root);
+    await writeFile(join(root, "tracked.txt"), "hello\nworld\n", "utf8");
+
+    runCli(["init"], { cwd: root });
+    const save = runCli(["save", "--reason", "context-limit"], {
+      cwd: root,
+      input: `## Goal
+Keep going.
+`,
+    });
+
+    expect(save.status).toBe(0);
+    const handoffPath = save.stdout.trim().split("\n").at(-1);
+    expect(handoffPath).toBeTruthy();
+    const markdown = await readFile(handoffPath!, "utf8");
+    expect(markdown).toContain("tracked.txt");
+    expect(markdown).not.toContain(".handoff");
+  });
+
   it("installs project skills", async () => {
     const root = await mkdtemp(join(tmpdir(), "agent-handoff-skills-"));
     const result = runCli(["install-skills", "--target", "project"], { cwd: root });

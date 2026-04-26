@@ -1,7 +1,7 @@
 {
   "name": "delta-torch",
   "version": "0.1.3",
-  "description": "Save tokens, survive context limits, and resume coding tasks across CLI agents with portable markdown handoffs.",
+  "description": "Save before context, usage, rate, or token-budget limits and resume coding tasks across Claude Code, Codex, Copilot, and local agents.",
   "type": "module",
   "bin": {
     "delta-torch": "dist/cli.js"
@@ -25,12 +25,21 @@
     "delta-torch",
     "ai-agents",
     "terminal-agent",
+    "agent-continuity",
+    "limit-fallback",
+    "context-limit",
+    "usage-limit",
+    "rate-limit",
+    "token-budget",
     "claude-code",
     "codex",
+    "github-copilot",
     "ollama",
     "skills",
     "handoff",
+    "handoffs",
     "checkpoint",
+    "checkpoints",
     "cli",
     "resume"
   ],
