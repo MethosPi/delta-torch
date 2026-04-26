@@ -155,7 +155,7 @@ That is a safety net, not a secret manager. Do not paste API keys, private keys,
 - DeltaTorch is not an MCP server, not an orchestrator, and not a daemon.
 - Claude Code gets slash-friendly skills. Other agents use the same handoff files and CLI.
 - DeltaTorch does not read hidden provider quota telemetry. Agents save proactively from visible warnings, context meters, rate-limit messages, or token budgets you gave them.
-- Every push to `main` runs tests and publishes a new npm/GitHub release.
+- Releases are gated on `v*` tag pushes. Add a [changeset](https://github.com/changesets/changesets) per change with `pnpm changeset`, run `pnpm changeset version` to bump `package.json` and update `CHANGELOG.md`, then push the resulting tag to publish.
 
 ## Manual Claude Install
 
