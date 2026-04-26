@@ -7,4 +7,4 @@ if [[ -z "${target}" ]]; then
 fi
 
 shift || true
-pnpm dlx agent-handoff resume "${target}" "$@"
+pnpm dlx delta-torch resume "${target}" "$@"

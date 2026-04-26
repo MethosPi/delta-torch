@@ -1,59 +1,150 @@
 # DeltaTorch
 
-DeltaTorch is a minimal open-source token handoff skill pack for Claude Code style workflows. It ships a small CLI plus installable skills that save a compact markdown checkpoint under `.handoff/` before context pressure, rate limits, or a mid-task stop make continuation expensive.
+Save tokens. Survive context limits. Finish the task.
 
-## What It Does
+DeltaTorch is a tiny CLI that lets any terminal agent save a compact checkpoint before context pressure, rate limits, or token exhaustion force a stop. The next agent reads that checkpoint, gets a clean resume prompt, and keeps going without burning tokens rediscovering the project state.
 
-- `init` creates `.handoff/` storage.
-- `install-skills` copies four Claude Code compatible skills into either project or personal skill directories.
-- `save` writes a compact markdown checkpoint using flags, stdin, and filtered git metadata.
-- `resume` prints a saved checkpoint plus a clean continuation prompt.
-- `list` shows recent checkpoints and the active project handoff state.
+It works with Claude Code, Codex, OpenCode, Hermes Agent, and local agents running through Ollama or other providers, because the handoff format is plain Markdown under `.handoff/`.
 
-## CLI
+npm package: [delta-torch](https://www.npmjs.com/package/delta-torch)
+
+## Why It Exists
+
+- Stop paying for the same context twice.
+- Keep long tasks moving when one agent hits limits.
+- Switch from a cloud agent to a cheaper or local model without losing momentum.
+- Leave behind a checkpoint another human or agent can audit in seconds.
+
+DeltaTorch is intentionally small. It is not an MCP server, not an orchestrator, not a daemon, and not a dashboard. It just creates portable handoff files that help agents continue real work.
+
+## The Core Loop
 
 ```bash
-pnpm dlx agent-handoff init
-pnpm dlx agent-handoff install-skills --target project
-pnpm dlx agent-handoff save --reason context-limit
-pnpm dlx agent-handoff resume latest
-pnpm dlx agent-handoff list
+pnpm dlx delta-torch init
+pnpm dlx delta-torch save --reason context-limit
+pnpm dlx delta-torch resume latest
+pnpm dlx delta-torch list
 ```
 
-### Save From Structured Stdin
+1. Start a task with your preferred CLI agent.
+2. Before the session gets expensive or unstable, save a handoff.
+3. Launch another agent.
+4. Resume from the generated checkpoint and keep shipping.
+
+## Cross-Agent Example
+
+You start a refactor in Claude Code.
+
+Claude is near its context limit, so you save:
 
 ```bash
-pnpm dlx agent-handoff save --reason context-limit <<'EOF'
+pnpm dlx delta-torch save --reason context-limit <<'EOF'
 ## Original Prompt
-Build the new handoff package and push it to GitHub.
+Refactor the auth flow and keep tests green.
 
 ## Goal
-Ship the minimal v1 CLI and Claude Code skills.
+Ship the refactor without restarting the work.
 
 ## Work Completed
-- Scaffolded the TypeScript package.
-- Implemented checkpoint persistence.
+- Moved session parsing into a shared module.
+- Updated API handlers.
 
 ## Current State
-Tests are passing locally.
+- Most code is done.
+- Two integration tests still fail.
 
 ## Problems / Risks
-- The npm name may conflict with an existing package.
+- Cookie parsing may still differ in edge runtime.
 
 ## Next Steps
-1. Create the public repository.
-2. Push the first release commit.
+1. Fix the failing tests.
+2. Re-run the auth suite.
+3. Commit only the refactor files.
 EOF
 ```
 
-## Installed Skills
+Now Claude stops. You open Codex, OpenCode, Hermes Agent, or a local Ollama-powered agent and run:
 
-- `handoff-guard`: standing instruction for long-running continuity.
-- `handoff-save`: explicit `/handoff-save [reason]`.
-- `handoff-resume`: explicit `/handoff-resume [latest|id]`.
-- `handoff-status`: explicit `/handoff-status`.
+```bash
+pnpm dlx delta-torch resume latest
+```
 
-Each skill is a short `SKILL.md` plus an optional tiny shell wrapper that forwards to `pnpm dlx agent-handoff ...`.
+DeltaTorch prints the saved checkpoint plus a ready-to-paste `Resume Prompt`. Paste it into the next agent and continue the same task instead of re-explaining the repo from scratch.
+
+That is the whole point: less wasted context, lower cost, more completed tasks.
+
+## Works With Any CLI Agent
+
+The handoff artifact is the product.
+
+- The checkpoint is a Markdown file in `.handoff/handoffs/`.
+- The resume payload is plain text, so any agent can consume it.
+- Claude Code gets optional skills because it supports folder-based `SKILL.md` skills natively.
+- Everyone else can use DeltaTorch directly from the CLI without any plugin system.
+
+## Optional Claude Code Skills
+
+If you use Claude Code, you can install the skill pack:
+
+```bash
+pnpm dlx delta-torch install-skills --target project
+```
+
+Installed skills:
+
+- `handoff-guard`: reminds the agent to save before context pressure becomes a problem.
+- `handoff-save`: creates a checkpoint on demand.
+- `handoff-resume`: loads the latest or requested checkpoint.
+- `handoff-status`: shows recent handoffs for the current project.
+
+These skills are convenience wrappers around the CLI. They are not required for Codex, Ollama-based agents, or any other terminal workflow.
+
+## Commands
+
+```bash
+pnpm dlx delta-torch init
+pnpm dlx delta-torch install-skills --target project
+pnpm dlx delta-torch save --reason context-limit
+pnpm dlx delta-torch resume latest
+pnpm dlx delta-torch list
+```
+
+### `save`
+
+`save` accepts structured Markdown on stdin and merges it with safe git metadata such as the current branch and filtered `git status --short`.
+
+```bash
+pnpm dlx delta-torch save --reason handoff <<'EOF'
+## Goal
+Finish the migration.
+
+## Work Completed
+- Replaced the old queue consumer.
+
+## Current State
+- Production config still needs validation.
+
+## Next Steps
+1. Run staging smoke tests.
+2. Roll forward if metrics stay clean.
+EOF
+```
+
+### `resume`
+
+`resume` prints the checkpoint and a continuation prompt that can be pasted into another agent.
+
+```bash
+pnpm dlx delta-torch resume latest
+```
+
+### `list`
+
+`list` shows the recent checkpoint history for the current project.
+
+```bash
+pnpm dlx delta-torch list
+```
 
 ## File Layout
 
@@ -65,11 +156,38 @@ Each skill is a short `SKILL.md` plus an optional tiny shell wrapper that forwar
     2026-04-26T12-30-00Z-context-limit.md
 ```
 
+Each checkpoint contains:
+
+- original prompt
+- goal
+- work completed
+- current state
+- changed files
+- commands run
+- problems or risks
+- next steps
+- a resume prompt for the next agent
+
 ## Security Defaults
 
-- Git-derived file lists are filtered to avoid `.env`, private key files, and common private credential paths.
-- Freeform checkpoint text is passed through lightweight secret redaction for common key and token patterns.
-- No file contents are read automatically.
+- DeltaTorch never reads your file contents automatically.
+- Git-derived file lists are filtered to avoid `.env`, private keys, and common private credential paths.
+- Freeform checkpoint text is passed through lightweight secret redaction for common token and key patterns.
+
+## Release Automation
+
+This repository is wired for automated versioning, GitHub Releases, and npm publishing.
+
+- CI runs on push and pull request.
+- Release Please opens version PRs from conventional commits.
+- Publishing happens from GitHub Actions to [npm](https://www.npmjs.com/package/delta-torch).
+
+One-time setup still required on npm:
+
+1. Create the `delta-torch` package in the `MethosPi` npm account.
+2. Configure npm Trusted Publishing for the `MethosPi/delta-torch` GitHub repository and `.github/workflows/release.yml`.
+
+After that, merging releasable commits to `main` is enough to cut versions and publish.
 
 ## Development
 
@@ -78,6 +196,4 @@ pnpm install
 pnpm test
 ```
 
-## Publish Note
-
-The desired unscoped npm package name `agent-handoff` is already in use on npm as of April 26, 2026. This repository keeps that working name in the codebase because it matches the intended CLI UX, but publishing the exact `pnpm dlx agent-handoff ...` flow will require acquiring that name or renaming before release.
+Use conventional commits such as `feat:` and `fix:` if you want the automated release flow to produce clean version bumps and release notes.

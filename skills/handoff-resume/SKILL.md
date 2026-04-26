@@ -14,4 +14,4 @@ Load the saved checkpoint and continue from it instead of restarting the task.
 "${CLAUDE_SKILL_DIR}/scripts/resume.sh" "$ARGUMENTS"
 ```
 
-The wrapper forwards to `pnpm dlx agent-handoff resume latest` or the selected checkpoint id. Read the output carefully, then continue from the `Resume Prompt` and `Next Steps` sections.
+The wrapper forwards to `pnpm dlx delta-torch resume latest` or the selected checkpoint id. Read the output carefully, then continue from the `Resume Prompt` and `Next Steps` sections.

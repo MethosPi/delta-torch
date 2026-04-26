@@ -30,7 +30,7 @@ const SECTION_FLAG_MAP: Record<string, SectionKey> = {
 function printHelp(): void {
   output.write(
     [
-      "agent-handoff",
+      "delta-torch",
       "",
       "Commands:",
       "  init",
@@ -291,7 +291,7 @@ async function main(): Promise<void> {
     }
 
     default:
-      throw new UserFacingError(`Unknown command: ${parsed.command}`);
+        throw new UserFacingError(`Unknown command: ${parsed.command}`);
   }
 }
 

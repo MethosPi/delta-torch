@@ -7,4 +7,4 @@ if [[ -z "${reason}" ]]; then
 fi
 
 shift || true
-pnpm dlx agent-handoff save --reason "${reason}" "$@"
+pnpm dlx delta-torch save --reason "${reason}" "$@"

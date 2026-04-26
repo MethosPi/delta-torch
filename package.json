@@ -1,14 +1,15 @@
 {
-  "name": "agent-handoff",
+  "name": "delta-torch",
   "version": "0.1.0",
-  "description": "Minimal token handoff CLI and Claude Code skill pack for compact project checkpoints.",
+  "description": "Save tokens, survive context limits, and resume coding tasks across CLI agents with portable markdown handoffs.",
   "type": "module",
   "bin": {
-    "agent-handoff": "dist/cli.js"
+    "delta-torch": "dist/cli.js"
   },
   "files": [
     "dist",
     "skills",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
@@ -20,12 +21,17 @@
     "test": "pnpm build && vitest run"
   },
   "keywords": [
+    "delta-torch",
+    "ai-agents",
+    "terminal-agent",
     "claude-code",
+    "codex",
+    "ollama",
     "skills",
     "handoff",
     "checkpoint",
     "cli",
-    "agent"
+    "resume"
   ],
   "license": "MIT",
   "engines": {

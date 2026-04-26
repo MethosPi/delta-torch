@@ -10,6 +10,6 @@ While this skill is active:
 2. Prefer saving early instead of waiting for the session to become unstable.
 3. Keep checkpoints short, factual, and useful for the next agent.
 4. Never include secrets, `.env` contents, tokens, or private keys in the checkpoint.
-5. Use `/handoff-save context-limit` or run `pnpm dlx agent-handoff save --reason context-limit` when it is time to hand off.
+5. Use `/handoff-save context-limit` or run `pnpm dlx delta-torch save --reason context-limit` when it is time to hand off.
 
 If the task is still active near the end of a session, create a fresh handoff before stopping.

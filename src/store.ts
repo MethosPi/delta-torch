@@ -102,7 +102,7 @@ export async function ensureInitializedProject(startCwd: string): Promise<string
   const projectRoot = findProjectRootWithHandoff(startCwd);
   if (!projectRoot) {
     throw new UserFacingError(
-      "No .handoff directory found. Run `agent-handoff init` in your project first.",
+      "No .handoff directory found. Run `delta-torch init` in your project first.",
     );
   }
 

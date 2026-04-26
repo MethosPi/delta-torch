@@ -42,15 +42,15 @@ describe("skill pack", () => {
       expect(frontmatter.description).toBeTruthy();
 
       if (directory === "handoff-save") {
-        expect(markdown).toContain("pnpm dlx agent-handoff save");
+        expect(markdown).toContain("pnpm dlx delta-torch save");
       }
 
       if (directory === "handoff-resume") {
-        expect(markdown).toContain("pnpm dlx agent-handoff resume");
+        expect(markdown).toContain("pnpm dlx delta-torch resume");
       }
 
       if (directory === "handoff-status") {
-        expect(markdown).toContain("pnpm dlx agent-handoff list");
+        expect(markdown).toContain("pnpm dlx delta-torch list");
       }
     }
   });

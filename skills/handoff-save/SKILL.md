@@ -44,4 +44,4 @@ Create a concise checkpoint for the current project state.
 EOF
 ```
 
-The wrapper forwards to `pnpm dlx agent-handoff save --reason ...`. After saving, report the checkpoint id and path.
+The wrapper forwards to `pnpm dlx delta-torch save --reason ...`. After saving, report the checkpoint id and path.

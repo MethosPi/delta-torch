@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const workspaceRoot = process.cwd();
-const cliPath = join(workspaceRoot, "dist", "src", "cli.js");
+const cliPath = join(workspaceRoot, "dist", "cli.js");
 
 function runCli(
   args: string[],
@@ -58,7 +58,7 @@ describe("cli", () => {
     const result = runCli(["save", "--reason", "manual"], { cwd: root });
 
     expect(result.status).toBe(1);
-    expect(result.stderr).toContain("Run `agent-handoff init`");
+    expect(result.stderr).toContain("Run `delta-torch init`");
   });
 
   it("saves, lists, and resumes in a non-git folder", async () => {
@@ -120,6 +120,6 @@ Keep going.
       join(root, ".claude", "skills", "handoff-save", "SKILL.md"),
       "utf8",
     );
-    expect(skill).toContain("pnpm dlx agent-handoff save");
+    expect(skill).toContain("pnpm dlx delta-torch save");
   });
 });
