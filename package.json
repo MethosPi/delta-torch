@@ -59,6 +59,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@types/node": "^24.9.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
